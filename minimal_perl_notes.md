@@ -184,3 +184,72 @@ perl -e 'print 53 * 19194, "\n";' # 1017282
 ```
 
 I always use Perl for these types of calculations because I can never remember the shell syntax
+
+Here is one way to generated the same output for the column names as done above with a UNIX pipe
+
+
+__ex001_column_name_count.pl__
+
+```{perl}
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+
+my $i = 0;
+print join("\n", map( {++$i . " $_" } split(/\t/, <>)));
+```
+
+Invoke with:
+
+```{console}
+perl ex001_column_name_count.pl gene_with_protein_product.txt
+```
+
+There is a lot going on in this short script with use of multiple defaults for __special variables__. Let's break it down:
+
+- Script arguments are assigned to the special variable __@ARGV__
+- Another special variable, __ARGV__, is the file handle that iterates over __@ARGV__
+- __ARGV__ is the default when no the input operator, __<>__ is empty 
+- If the input operator __<>__ is called in a loop, it will iterate over all the lines
+- In this example, it is called just once inside the __split__ function so it returns the first line only
+- The __split__ function returns a list of column names
+- The column name list elements are then processed in an implicit loop by the __map__ function
+- __map__ assigns each element to the special variable <em>$_</em> and prepends an incrementing integer
+- __map__'s output list is then passed to the __join__ function
+- The __join__ function returns a string with thee list's elements concatenated with new line characters
+- This is then printed to the console
+
+
+A more verbose version of the script above might help to clarify the steps involved.
+
+__ex002_column_name_count.pl__
+
+```{perl}
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# A more verbose version of ex001_column_name_count.pl
+my $file = $ARGV[0];
+my $first_line = <ARGV>;
+my @column_names = split(/\t/, $first_line);
+my @column_names_indexed = ();
+for(my $i = 0; $i <= $#column_names; $i++) {
+    my $column_name = $column_names[$i];
+    my $column_name_indexed = ($i + 1) . ' ' . $column_name;
+    push(@column_names_indexed, $column_name_indexed);
+}
+my $output = join("\n", @column_names_indexed);
+print $output;
+```
+
+This is a much more verbose version of the earlier script with each step spelled out in what some call "baby Perl".
+When starting out with Perl, it is often advisable to write scripts in this explicit step-by-step fashion until you gain confidence with the language.
+We are now using __@ARGV__ and the the special file handle, __ARGV__, explicitly while the default input variable <em>$_</em> has been eliminated
+See also how the __map__ call has been replaced by the simple C-style __for__ loop! Experienced Perl programmers would not write scripts this way but this
+version has the virtue of being easy to explain, especially to those with limited Perl exposure.
+
+
