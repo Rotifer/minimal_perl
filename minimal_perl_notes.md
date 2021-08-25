@@ -116,8 +116,68 @@ The command sequence above reads as follows:
 - _cat -n_ prints the transposed line with line numbers prepended
 
 
+Here is the output:
+
+```
+     1	hgnc_id
+     2	symbol
+     3	name
+     4	locus_group
+     5	locus_type
+     6	status
+     7	location
+     8	location_sortable
+     9	alias_symbol
+    10	alias_name
+    11	prev_symbol
+    12	prev_name
+    13	gene_family
+    14	gene_family_id
+    15	date_approved_reserved
+    16	date_symbol_changed
+    17	date_name_changed
+    18	date_modified
+    19	entrez_id
+    20	ensembl_gene_id
+    21	vega_id
+    22	ucsc_id
+    23	ena
+    24	refseq_accession
+    25	ccds_id
+    26	uniprot_ids
+    27	pubmed_id
+    28	mgd_id
+    29	rgd_id
+    30	lsdb
+    31	cosmic
+    32	omim_id
+    33	mirbase
+    34	homeodb
+    35	snornabase
+    36	bioparadigms_slc
+    37	orphanet
+    38	pseudogene.org
+    39	horde_id
+    40	merops
+    41	imgt
+    42	iuphar
+    43	kznf_gene_catalog
+    44	mamit-trnadb
+    45	cd
+    46	lncrnadb
+    47	enzyme_id
+    48	intermediate_filament_db
+    49	rna_central_ids
+    50	lncipedia
+    51	gtrnadb
+    52	agr
+    53	mane_select
+```
+
+
 There are __53__ columns at the time this file was downloaded! That gives us 19194 * 53 "cells"
 We can use a Perl one-liner as follows to do the calculation
+
 
 ```{console}
 perl -e 'print 53 * 19194, "\n";' # 1017282
