@@ -41,11 +41,14 @@ I will flag it as such
 
 ### Downloading the data
 
+If _curl_ is insalled you can use that as shown below.
+
 ```{console}
 curl  http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/locus_types/gene_with_protein_product.txt -o gene_with_protein_product.txt -s
 ```
 
-
+Alternatively, you can use the Perl _LWP::Simple_ package which comes with the standard Perl distribution. Note how I have used the _File::Basename_
+package to extract the target file name using its exported _basename_ function which is analagous to the its UNIX namesake.
 
 ```{perl}
 #!/usr/bin/perl
@@ -62,5 +65,62 @@ my $file = basename($url);
 getstore($url, $file);
 ```
 
+A third approach to downloading the file is embedding where we could embed the _curl_ command in a Perl script or embed the Perl command in a shell script.
+Perl was originally conceived as a __glue__ language so it unsurprisingly excels at managing UNIX utilities. This is a theme we will explore in much greater
+depth as we proceed.
+
+### Exploring the data
+
+When working with this types of text file, the first two questions I ask of it are: how many columns and how many rows does it have?
+
+#### Row count
+ 
+In shell, we can do the following:
+
+```{console}
+wc -l gene_with_protein_product.txt
+# =>19194
+```
+
+This does the same thing in Perl executed from the shell command line as a one-liner
+
+```
+perl -pe '}{$_=$.' gene_with_protein_product.txt
+```
+
+This works but I admit I don't understand how it works, I took it from [PerlMonks](https://www.perlmonks.org/?node_id=538824)
+
+Clearly, _wc -l_ is the best option here.
+
+#### Column count and column names
+
+```{console}
+head -1 gene_with_protein_product.txt | cat -vet
+```
+
+This short and useful command sequence reads as follows: take the first line of the file and pipe it to _cat_ using the _-e_ option
+so that non-printing characters (with the exception of tabs, new-lines and form-feeds) are printed visibly. The tabs are now visible
+as __^I__.
+
+It is useful to have the column names extracted and numbered so that we can see how many there are, their order and the total number.
+Another piped sequence of UNIX command can do this easily:
+
+```{console}
+head -1 gene_with_protein_product.txt | tr '\t' '\n' | cat -n # 53 columns!
+```
+
+The command sequence above reads as follows:
+
+- get the first line  (_head -1_) and pipe it to _tr_
+- _tr_ converts the tabs into new lines to transpose the line (columns => rows)
+- _cat -n_ prints the transposed line with line numbers prepended
 
 
+There are __53__ columns at the time this file was downloaded! That gives us 19194 * 53 "cells"
+We can use a Perl one-liner as follows to do the calculation
+
+```{console}
+perl -e 'print 53 * 19194, "\n";' # 1017282
+```
+
+I always use Perl for these types of calculations because I can never remember the shell syntax
