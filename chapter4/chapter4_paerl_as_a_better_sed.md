@@ -188,3 +188,103 @@ perl -i.$SECONDS -wpl -e 's/RE/something/g;'  file
 ```
 
 Clobber-proofing backup files in scripts: __$$__
+
+For scripts that do in-place editing, I recommend an even more robust technique for avoiding the reuse of
+ backup-filename extensions and protecting against backup-file clobberation. Instead of providing a 
+file extension after the i option, as in -i.bak, you should use the option alone and set the 
+special variable __$^I__ to the desired file extension in a BEGIN block.
+
+```{perl}
+#! /usr/bin/perl –i -wpl
+
+BEGIN { $^I=$$; }       # Use script's PID as file extension
+
+s/UNIX/Linux/g;
+```
+
+Don't use $$ with in-place file editing in one-liners
+
+Perl provides a set of string modifiers that can be used in double quoted strings or the replacement field 
+of a substitution operator to effect uppercase or lowercase conversions.
+
+__\U__: convert the string on the right to uppercase stop at __\E__ or end of string
+__\L__: convert the string on the right to lowercase stop at __\E__ or end of string
+__\u__: convert the character on the right to uppercase
+__\l__: convert the character on the right to lowercase
+
+
+
+
+
+
+using \L:
+
+```{console}
+perl -wpl -e 's/^.*$/\L$&/g;' make_money_fast
+```
+
+__Compputed substitutions__
+
+Like the Unix shells, Perl has a built-in eval function that you can use to execute a chunk of
+ code that’s built during execution. 
+A convenient way to invoke eval is through use of the e modifier to the substitution operator like so:
+_s/RE/code/e;_
+
+Here’s the m2k script—which, like much in the world of Perl, is tiny but powerful:
+
+```{perl}
+#! /usr/bin/perl -wpl
+
+BEGIN { print "Driving Distance in Kilometers"; }
+s/\d+/ $& * 1.6 /ge;
+```
+
+The special match-variable $& contains the characters that were matched; by using it in the replacement field, the figure in miles gets multiplied by 1.6, with the resulting kilometer figure becoming the replacement string. The g (for global) modifier ensures that all the numbers on each line get replaced, instead of just the leftmost ones (i.e., those in the “Van” column). As usual, the p option ensures that the current line gets printed, regardless of whether any modifications have been performed—which is why the column headings, which lack numbers, are also present in the output.
+
+
+__check_length__ script:
+
+```{perl}
+#! /usr/bin/perl -wnl
+
+use Text::Tabs;         # provides "expand" function
+
+s/^.*$/expand $&/ge;    # replace tabs by spaces in line
+
+length > 55  and
+    print "** WARNING:  Line $. is too long:";
+
+print;                  # Now print the line
+```
+
+__check_length2__
+
+```{perl}
+#! /usr/bin/perl -s  -wnl
+
+use Text::Tabs;          # provides "expand" function
+
+BEGIN {
+    $maxlength  or
+        warn "Usage: $0 -maxlength=character_count [files]\n"  and
+            exit 255;
+}
+
+s/^.*$/expand $&/ge;    # replace tabs by spaces in line
+
+length > $maxlength  and
+        print "** WARNING:  Line $. is too long:";
+
+print;                  # Now print the line
+```
+
+
+__Useful resources__
+
+```{console}
+perldoc Text::Tabs   # documentation for "expand" function
+man ascii
+man s2p # sed-to-perl converter
+```
+
+
