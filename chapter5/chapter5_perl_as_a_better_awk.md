@@ -79,8 +79,44 @@ awk -F'\t' ' {print NF}' ../gene_with_protein_product.txt | uniq
 perl  -F"\t" -anE 'BEGIN{$NF = 0;} $NF = @F; say $NF;' ../gene_with_protein_product.txt | uniq
 ```
 
+We can eliminate the call to _uniq_
+
+```{console}
+# Perl
+perl  -F"\t" -anE 'BEGIN {%rowcounts = ();} $NF = @F; $rowcounts{$NF} = ""; END {say join(", ", keys %rowcounts);}' ../gene_with_protein_product.txt
+# AWK
+awk -F'\t' ' {rowcounts[NF] = ""} END {for (nr in  rowcounts) { print nr} }' ../gene_with_protein_product.txt
+```
+
+These examples depend on the use of Perl’s n and a invocation options to load the fields of the current input record into @F.
+
+An earlier example used slicing of the @F array to extract fields. The same effect can be achieved using __undef__ for unwanted columns like so:
+
+```{perl}
+(undef, $second, $third)=@F;
+```
+
+The first column and all columns to the right of the third column, if there are any,  will be excluded.
+
+Our first task is to choose an appropriate Primary Option Cluster from table 2.9, which prescribes -wnla for field-processing
+ applications where the default whitespace delimiters are desired. Perl’s n option requests the inclusion of an implicit input-reading loop, 
+as we’ve discussed, and the a option additionally requests the automatic splitting of each input record into fields, which are stored in the @F array.
 
 
+Example file from book called X
 
+```{console}
+cat X
+awk '{ print $3 "\t" $1 }' X
+perl -wnla -e '($b_date, undef, $fname)=@F; print "$fname\t$b_date";' X
+# Same as above but dropped the -l option and replaced -e with -E so we can use thsay instead of print
+perl -wna -E '($b_date, undef, $fname)=@F; say "$fname\t$b_date";' 
+```
+
+A fundamental difference is that Perl, like many other computer languages, requires commas to appear between arguments. 
+In contrast, AWK allows commas to be present in print statements—to indicate that arguments should be separated in the output by the value of the 
+OFS variable (see table 5.2)—or commas to be absent, to indicate that the arguments should be concatenated together on output.
+
+By default, Perl’s a option splits input records into fields using whitespace characters as field separators. 
 
 
