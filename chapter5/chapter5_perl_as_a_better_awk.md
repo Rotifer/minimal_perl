@@ -33,4 +33,28 @@ __Perl’s variable interpolation__
 
 Like the Shell, but unlike AWK, Perl allows variables to be interpolated within double-quoted strings, which means the variable names are replaced by their contents.
 
+Perl provides in-place editing of input files, through the –i.ext option. 
+This makes it easy for the programmer to save the results of editing operations back in the original file(s). AWK lacks this capability.
+
+Another potential advantage is that in Perl, automatic field processing is disabled by default, so JAPHs only pay its performance 
+penalty in the programs that benefit from it. 
+In contrast, all AWK programs split input records into fields and assign them to variables, whether fields are used in the program or not
+
+## Example data
+
+Created from the Hugo genes file using AWK to select some columns
+
+```{console}
+awk -F'\t' 'BEGIN{OFS="\t"} {print $1, $2, $3, $8, $9}' ../gene_with_protein_product.txt >awk_perl_example_file.tsv
+wc -l awk_perl_example_file.tsv # 19194 lines
+```
+
+In AWK, $1 means the first field of the current record, $2 the second field, and so forth. By default, any sequence of one 
+or more spaces or tabs is taken as a single field separator, and each line constitutes one record. 
+
+Perl'smechanism for accessing fields involves copying the fields of the current record from the field container @F into a parenthesized 
+list of user-defined variables.
+
+
+
 
