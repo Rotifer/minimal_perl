@@ -55,6 +55,32 @@ or more spaces or tabs is taken as a single field separator, and each line const
 Perl'smechanism for accessing fields involves copying the fields of the current record from the field container @F into a parenthesized 
 list of user-defined variables.
 
+nvolves copying the fields of the current record from the field container @F into a parenthesized list of user-defined variables.
+
+### Perl version of the AWK script above
+
+```{console}
+perl  -F"\t" -anE '@fields = @F[0, 1, 2, 7, 8]; say join("\t", @fields);' ../gene_with_protein_product.txt >awk_perl_example_file.tsv
+```
+
+__A few notes on the Perl version__
+
+- The **-E** option in place of -e allows us to use __say__ in place of print thereby avoidng the need to add new lines to output
+- Perl list slicing is very convenient for extracting fields from @F
+
+### Counting the number of columns
+
+Given a delimiter, we would like to check that each row has the same number of columns.
+
+```{console}
+# AWK
+awk -F'\t' ' {print NF}' ../gene_with_protein_product.txt | uniq
+# Perl
+perl  -F"\t" -anE 'BEGIN{$NF = 0;} $NF = @F; say $NF;' ../gene_with_protein_product.txt | uniq
+```
+
+
+
 
 
 
