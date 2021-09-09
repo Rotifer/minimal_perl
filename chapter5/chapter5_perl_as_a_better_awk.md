@@ -119,4 +119,16 @@ OFS variable (see table 5.2)—or commas to be absent, to indicate that the argu
 
 By default, Perl’s a option splits input records into fields using whitespace characters as field separators. 
 
+To change Perl’s idea of what constitutes a field separator, you specify with the F invocation option the desired character(s) or regular expression—as in AWK. 
+
+```{console}
+echo 'Stimey:Matthew Beard' | perl -wnlaF':' -e '($character)=@F; print $character;'
+```
+
+rgument to -F can use single or double quotes and can be a single character, e.g. tab ('\t') or a regex pattern such as '[\t:-]'; it is very flexible.
+
+single quotes around their contents, to allow them to work properly when submitted to a Shell
+
+After field processing, AWK’s next most highly prized feature is its ability to combine pattern matching with conditional execution. 
+
 
