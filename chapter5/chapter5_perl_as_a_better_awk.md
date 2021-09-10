@@ -167,4 +167,25 @@ awk -F: 'NR != 2 {print}' columns
 perl -wanF: -e '@F != 2 and print' columns
 ```
 
+- Prints records that have “9” at the beginning of the second field.
+
+```{console}
+# Create a dummy numbers file
+cat >numbers.csv
+10	12	13
+11	91	12
+34	18	12
+56	9	21
+0	0	0
+23	12	-12
+```
+
+```{console}
+awk -F"\t" '$2 ~ /^9/ {print}' numbers.csv
+perl -wanF"\t" -e '$F[1] =~ /^9/ and print' numbers.csv
+perl -wanF"\t" -E '$F[1] =~ /^9/ and say $F[0]' numbers.csv
+```
+
+- Prepend record numbers to records and prints them
+
 
