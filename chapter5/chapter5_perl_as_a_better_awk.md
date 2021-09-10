@@ -188,4 +188,41 @@ perl -wanF"\t" -E '$F[1] =~ /^9/ and say $F[0]' numbers.csv
 
 - Prepend record numbers to records and prints them
 
+```{console}
+awk -F\t '{print NR "\t" $0}' numbers.csv
+perl -wanF"\t" -e 'print "$.\t$_"' numbers.csv
+```
+
+- Print the last field of each line, using negative indexing in Perl’s case 
+
+```{console}
+awk -F"\t" '{print $NF}' numbers.csv
+perl -wanF"\t" -e 'print $F[-1]' numbers.csv
+```
+
+- Report the total number of records read.
+
+```{console}
+awk -F"\t" 'END {print NR}' numbers.csv
+perl -wn -E 'END {say $.}' numbers.csv
+```
+
+- For input lines consisting of individual numbers, reports the average of those numbers.
+
+```{console}
+# Extracting the first column for the average calculation
+awk -F"\t" '{print $1}' numbers.csv | awk 'BEGIN { print "AVERAGE:"} { total=total + $0 } END {print total / NR}' 
+perl -wanF"\t" -E  'say $F[0]' numbers.csv | perl -wnF"\t" -E 'BEGIN {say "AVERAGE:"} $total += $_; END {say $total/$.}'
+```
+
+The AWK programs in the upper panel of table 5.8 are of the Pattern-only type, employing the default Action of printing the selected records. Their Perl counterparts need an explicit and print clause to obtain the same functionality. Notice also that AWK’s && (logical and) used in the compound test of the first example becomes and in the Perl version. The examples of the first two rows demonstrate that Patterns don’t necessarily involve matching—conditions based on relational operators (“<=”, “!=”, etc.; see table 5.11) are among the others you can use.
+
+The programs in the table’s middle panel are of the Action-only type, in which all records are selected for processing by the Action (with the help of the n option in the Perl versions).
+
+The programs in the bottom panel each use at least one Pattern/Action pair, although that may not be readily apparent. That’s because BEGIN and END are pseudo-Patterns that respectively become True before any input has been read or after all input has been read. Accordingly, the statements in a BEGIN block are the first to be executed in a program, and those in the END block are the last.[17]
+
+As shown in table 5.8’s last row, a BEGIN block is used for preliminary operations, such as printing a heading to describe the upcoming output of those programs. The programs then employ an Action-only statement to accumulate a total, and after all the input has been processed, they calculate and print the average of the numbers in and END block.
+
+
+## Combining pattern matching with field processing
 
