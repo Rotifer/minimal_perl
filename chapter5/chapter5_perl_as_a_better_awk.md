@@ -141,11 +141,30 @@ Patterns in AWK and Perl needn’t be matching oriented; you can use any True/Fa
 
 ## Comparing Pattern/Action operation in AWK and Perl
 
-- Prints records 1 through 3 of the input.
+- Print records 1 through 3 of the input.
 
 ```{console}
 awk '1 <= NR && NR <= 3 {print}' ../gene_with_protein_product.txt
 perl -wnle '1 <= $. and $. <= 3 and print' ../gene_with_protein_product.txt
+```
+
+- Print lines where the column number != 2
+
+```{console}
+# Dummy data
+cat >columns
+a:b:c 
+d:e
+f:g
+h
+:i:j            
+k:l
+^C
+```
+
+```{console}
+awk -F: 'NR != 2 {print}' columns
+perl -wanF: -e '@F != 2 and print' columns
 ```
 
 
