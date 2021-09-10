@@ -203,7 +203,7 @@ perl -wanF"\t" -e 'print $F[-1]' numbers.csv
 - Report the total number of records read.
 
 ```{console}
-awk -F"\t" 'END {print NR}' numbers.csv
+awk  'END {print NR}' numbers.csv
 perl -wn -E 'END {say $.}' numbers.csv
 ```
 
