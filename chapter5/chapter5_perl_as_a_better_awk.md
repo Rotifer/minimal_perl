@@ -131,4 +131,21 @@ single quotes around their contents, to allow them to work properly when submitt
 
 After field processing, AWK’s next most highly prized feature is its ability to combine pattern matching with conditional execution. 
 
+AWK’s creators recognized this fact and engineered it so that any of its activities could be dependent on the result of a match. Perl shares this property.
+
+```{console}
+perl -wnl -e '/CD\d{2,}/  and  print $_;' ../gene_with_protein_product.txt | perl -wanE 'say $F[1];'
+```
+
+Patterns in AWK and Perl needn’t be matching oriented; you can use any True/False expression as a conditional element, such as “$. > 42”
+
+## Comparing Pattern/Action operation in AWK and Perl
+
+- Prints records 1 through 3 of the input.
+
+```{console}
+awk '1 <= NR && NR <= 3 {print}' ../gene_with_protein_product.txt
+perl -wnle '1 <= $. and $. <= 3 and print' ../gene_with_protein_product.txt
+```
+
 
