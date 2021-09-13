@@ -339,4 +339,22 @@ awk '/Monday/ , /Wednesday/' days
 perl -wnl -e '/Monday/ .. /Wednesday/ and print;' days
 ```
 
+Perl provides two variations on the range operator—one that gives AWK-like results using two dots, and one that gives sed-like results using three dots. The difference is that the two-dot version performs the test for the second match on the same line that matched the first one (as AWK does), allowing the same line to satisfy both matches. In contrast, the three-dot version requires the second match to occur with a following record (as with sed)
+
+An example in words:
+
+```{console}
+perl -wnl -e '/Oct 19/ ... /Oct 21/ and  ! /Oct 21/ and /File doesn\047t exist:/ and print;' error_log 
+```
+
+Select lines starting with the first that contains Oct 19 up to the next that contains Oct 21, and for the lines that don’t contain Oct 21, 
+if the error message is present, print the line.
+
+```{console}
+Here’s a command that extracts and displays any POD documentation it finds in a file:
+
+```{console}
+perl -wnl -e '/^=pod$/ ... /^=cut$/ and print;' show_fields2_1
+```
+
 
