@@ -226,3 +226,56 @@ As shown in table 5.8’s last row, a BEGIN block is used for preliminary operat
 
 ## Combining pattern matching with field processing
 
+AWK’s Pattern/Action model allows you to combine a record selection step with the conditional printing of selective fields from a record, as in this simple example:
+
+```{console}
+awk '/^:/ {print}' columns # /pattern/ {action}
+```
+
+__mean_annual_precip__ script
+
+```{perl}
+#! /usr/bin/perl -00 -wnla
+# Parses "Operational Climatic Data Summary" reports to extract
+#  and print "mean annual precipitation" statistic for each file.
+#
+# Find precipitation record, and print its field #33 (index 32)
+#
+/^ 2\. PRECIPITATION /  and  print "\u$ARGV: $F[32]";
+```
+
+The script is designed to read multiple files in sequence (via option n) using paragraph mode (-00) and to automatically load the fields of each record into @F (using a). To home in on the correct portion of each city’s data file, the matching operator is used to find the paragraph with the PRECIPITATION heading by looking at the beginning of a paragraph for a space, a 2, a literal dot, and then two spaces before that word.
+
+Next, the logical and is used to print the file’s name (via $ARGV; see table 2.7) followed by a colon, a space, and the value of the appropriate field within the record. Notice the use of \u before $ARGV (see table 4.5), which conveniently capitalizes the first letter of each city’s name. To help you visualize the implicit lines-to-record mapping that determines the index numbers for the fields in @F, consider the following data file:
+
+A B
+C D
+When read in line mode, each line would have two fields, and the maximum index for each record’s @F would be 1.
+
+However, if you read the same file in paragraph mode, each field would be considered part of the same record and treated for field-numbering purposes as if the input had looked like this:
+
+A B C D
+Therefore, field “D” would be stored under the index of 3, rather than under 1, as it would be with input records defined as lines.
+
+```{perl}
+#! /usr/bin/perl -s -00 -wnla
+# Prints field indicated by the $recnum/$fnum combination,
+#   preceded by filename
+# Example invocation: extract_cell  -recnum=6 -fnum=33 miami new_york seattle
+
+BEGIN {
+    $fnum  and  $recnum or
+        warn "Usage: $0 -recnum=M -fnum=N\n"  and
+            exit 255;
+    # Decrement field number, so user can say 1, and get index of 0
+    $index=$fnum - 1;
+}
+$. == $recnum  and  print "\u$ARGV: $F[$index]";
+
+# Reset record counter $. after end of each file
+eof  and  close ARGV;
+```
+
+The script begins by checking that both of the obligatory switches have been supplied and by issuing a “Usage:” message and exiting if they weren’t. The last statement of the script senses whether input from the current file has been exhausted by calling the built-in eof function; if that’s true, the script closes the current file by referencing its filehandle, ARGV.[22] The effect is to reset the “$.” variable back to 1 for the next file, so the program can continue to correctly identify the record number desired by the value of “$.”.
+
+
