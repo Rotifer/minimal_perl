@@ -400,4 +400,31 @@ perl -wl -e "print $*;"
 
 Perl is smart enough to exit automatically once it runs out of things to do, so there’s no need for an explicit exit statement in this script as there was with the classic AWK of nexpr’s era. Nor is there any need for a BEGIN block, which the AWK version requires to position its statements outside the (obligatory) implicit input-reading loop. That’s because that (unnecessary) loop can be omitted from the Perl version through use of the –wl cluster instead of –wnl.
 
+The nexpr_p Shell script works the same way nexpr does—by exploiting the Shell’s willingness to substitute the script’s own arguments
 
+Using an external module:
+
+```{perl}
+#! /usr/bin/perl -s -wn
+
+use Lingua::EN::Inflect 'PL_N'; # import noun pluralizer
+
+BEGIN {
+    $Usage="Usage: $0 -amount=dollars -rate=percent";
+
+    # Check for proper invocation
+    $amount  and  $rate  or  warn "$Usage\n"  and  exit 255;
+
+    $pct_rate=$rate/100;          #   5 becomes .05
+    $multiplier=1 + $pct_rate;    # .05 becomes 1.05
+    # Instruct user
+    print "Press <ENTER> to see \$$amount compound at $rate%.";
+}
+
+$amount=$amount * $multiplier;        # accumulate growth
+
+# $. counts input lines, which represent years
+print "\$$amount after $. ",  PL_N 'year', $.;
+
+END { print "\n"; } # start shell prompt on fresh line after <^D>
+```
