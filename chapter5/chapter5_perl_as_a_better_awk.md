@@ -257,11 +257,13 @@ However, if you read the same file in paragraph mode, each field would be consid
 A B C D
 Therefore, field “D” would be stored under the index of 3, rather than under 1, as it would be with input records defined as lines.
 
+__extract_cell1__
+
 ```{perl}
 #! /usr/bin/perl -s -00 -wnla
 # Prints field indicated by the $recnum/$fnum combination,
 #   preceded by filename
-# Example invocation: extract_cell  -recnum=6 -fnum=33 miami new_york seattle
+# Example invocation: extract_cell1  -recnum=6 -fnum=33 miami new_york seattle
 
 BEGIN {
     $fnum  and  $recnum or
@@ -277,5 +279,64 @@ eof  and  close ARGV;
 ```
 
 The script begins by checking that both of the obligatory switches have been supplied and by issuing a “Usage:” message and exiting if they weren’t. The last statement of the script senses whether input from the current file has been exhausted by calling the built-in eof function; if that’s true, the script closes the current file by referencing its filehandle, ARGV.[22] The effect is to reset the “$.” variable back to 1 for the next file, so the program can continue to correctly identify the record number desired by the value of “$.”.
+
+
+__extract_cell2__
+
+modifies the script to default to line-mode but to allow paragraph mode to be enabled by a command-line switch when desired. This requires removing the -00 invocation option from the shebang line and selectively enabling paragraph mode by conditionally assigning a null string to $/ 
+
+```{console}
+#! /usr/bin/perl -s -wnla
+
+# Prints field indicated by $recnum/$fnum, preceded by filename.
+# -fnum switch handles field numbers as well as negative indices.
+
+# Invocation: extract_cell2 -p -recnum=6 -fnum=-1 miami new_york seattle
+
+our ($p);       # -p switch for paragraph mode is optional
+
+BEGIN {
+  $fnum  and  $recnum or
+      warn "Usage: $0 -recnum=M -fnum=N\n"  and
+          exit 255;
+  # Decrement positive fnum, so user can say 1, and get index of 0
+  # But don't decrement negative values; they're indices already!
+   $index=$fnum;               # initially assume $fnum is an index
+   $index >= 1 and $index--;   # make it an index if it wasn't
+   $p  and  $/="";             # set paragraph mode if requested
+}
+$. == $recnum  and  print "\u$ARGV: $F[$index]";
+
+# Reset record counter $. after end of each file
+eof  and  close ARGV;
+```
+
+Notice the use of the –p switch to enable paragraph mode, which isn’t hard-coded within the script as it was in the earlier version, and the use of the convenient -1 index rather than the field number of 101, to specify the last field of the record.
+
+### Matching ranges of record
+
+Notice that the apostrophe in “doesn’t” is represented by its numeric code, to avoid a clash with the surrounding Shell-level single quotes:
+
+```{console}
+perl -wnl -e '/File doesn\047t exist:/ and print;' error_log
+```
+
+A pattern range is a facility for selecting a series of records occurring between a pair of pattern matches. In a typical AWK usage, the programmer separates two slash-delimited regexes by a comma, and AWK’s default Action is used to print the matching lines along with those that fall between them.
+
+```{console}
+cat >days
+Sunday
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
+# CTRL-D
+
+awk '/Monday/ , /Wednesday/' days
+# The equivalent Perl program uses the range operator (..) between two matching operators:
+perl -wnl -e '/Monday/ .. /Wednesday/ and print;' days
+```
 
 
