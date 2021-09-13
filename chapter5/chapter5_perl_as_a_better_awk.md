@@ -357,4 +357,47 @@ Here’s a command that extracts and displays any POD documentation it finds in 
 perl -wnl -e '/^=pod$/ ... /^=cut$/ and print;' show_fields2_1
 ```
 
+In contrast to AWK, Perl programmers use different operators for comparing numbers and strings, which eliminates guesswork of the kind that AWK engages in when such comparisons are made. 
+
+__Task__: Print lines 24-42 inclusive of file
+
+```{console}
+# make sample file
+awk -F'\t' 'BEGIN {OFS = "\t"} {print NR, $1, $2, $7}' ../gene_with_protein_product.txt | head -100 >sample_file_to_test_range_printing.tsv
+# awk version
+awk 'NR >= 24 && NR <= 42'  sample_file_to_test_range_printing.tsv
+# perl version
+perl -wn -e '$. >= 24 and $. <= 42 and print;'  sample_file_to_test_range_printing.tsv
+```
+
+In AWK, the {print} action can be dropped because it is the default.
+
+Perl has one relational operator that AWK lacks, called the comparison operator. Like the others, it comes in two forms: one for comparing numbers (<=>) and one for comparing strings (cmp). Its purpose is to return a number that indicates whether the left operand is less than, equal to, or greater than the right operand.[30] It’s most commonly used with the sort function
+
+all occurrences of the $0 variable in the AWK examples must be converted to $_ for Perl (assuming use of the n or p option).
+
+Notice in particular that the “offset” argument (#2) of AWK’s substr (“substring”) function needs to be a 1 to grab characters from the very beginning of the string, whereas in Perl, the value 0 has that meaning.
+
+Another difference is that GAWK’s case-conversion functions, toupper and tolower, have two corresponding resources in Perl—the functions called uc and lc, and the \U and \L string modifiers
+
+__nexpr__
+
+```{sh}
+#! /bin/sh
+awk "BEGIN{ print $*; exit }"
+```
+
+Perl version
+
+```{sh}
+#! /bin/sh
+# This script uses the Shell to create and run a custom Perl
+# program that evaluates and prints its arguments.
+# Sample transformation: nexpr_p '2 * 21' --> perl ... print 2 * 21;
+
+perl -wl -e "print $*;"
+```
+
+Perl is smart enough to exit automatically once it runs out of things to do, so there’s no need for an explicit exit statement in this script as there was with the classic AWK of nexpr’s era. Nor is there any need for a BEGIN block, which the AWK version requires to position its statements outside the (obligatory) implicit input-reading loop. That’s because that (unnecessary) loop can be omitted from the Perl version through use of the –wl cluster instead of –wnl.
+
 
